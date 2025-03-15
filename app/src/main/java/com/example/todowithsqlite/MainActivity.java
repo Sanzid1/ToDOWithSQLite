@@ -33,16 +33,8 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     private RecyclerView recyclerView;
     private TaskAdapter taskAdapter;
     private DatabaseHelper databaseHelper;
-    private List<Task> taskList;
     private FloatingActionButton fabAddTask;
     
-    // These fields are used across multiple methods
-    private RecyclerView recyclerView;
-    private TaskAdapter taskAdapter;
-    private DatabaseHelper databaseHelper;
-    private List<Task> taskList;
-    private FloatingActionButton fabAddTask;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,9 +45,6 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        
-        // Date format is only used in this method and showAddTaskDialog
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
         
         // Initialize database helper
         databaseHelper = new DatabaseHelper(this);
@@ -75,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     }
     
     private void loadTasks() {
-        taskList = databaseHelper.getAllTasks();
+        List<Task> taskList = databaseHelper.getAllTasks();
         taskAdapter = new TaskAdapter(taskList, this);
         recyclerView.setAdapter(taskAdapter);
     }
@@ -85,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_add_task, null);
         builder.setView(dialogView);
+        
+        // Initialize date format
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
         
         // Initialize dialog components
         TextView dialogTitle = dialogView.findViewById(R.id.dialog_title);
