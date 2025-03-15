@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">ToDOWithSQLite</string>
+    <string name="edit_task">Edit Task</string>
+    <string name="no_date_selected">No date selected</string>
+    <string name="title_empty_error">Title cannot be empty</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="task_deleted">Task deleted</string>
 </resources>

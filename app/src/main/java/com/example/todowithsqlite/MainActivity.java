@@ -36,8 +36,12 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
     private List<Task> taskList;
     private FloatingActionButton fabAddTask;
     
-    private Calendar selectedDate;
-    private SimpleDateFormat dateFormat;
+    // These fields are used across multiple methods
+    private RecyclerView recyclerView;
+    private TaskAdapter taskAdapter;
+    private DatabaseHelper databaseHelper;
+    private List<Task> taskList;
+    private FloatingActionButton fabAddTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +54,8 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
             return insets;
         });
         
-        // Initialize date format
-        dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        // Date format is only used in this method and showAddTaskDialog
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
         
         // Initialize database helper
         databaseHelper = new DatabaseHelper(this);
@@ -90,12 +94,12 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         TextView textSelectedDate = dialogView.findViewById(R.id.text_selected_date);
         
         // Set up date picker
-        selectedDate = Calendar.getInstance();
+        Calendar selectedDate = Calendar.getInstance();
         
         // If editing a task, populate fields
         boolean isEditing = taskToEdit != null;
         if (isEditing) {
-            dialogTitle.setText("Edit Task");
+            dialogTitle.setText(R.string.edit_task);
             editTitle.setText(taskToEdit.getTitle());
             editDescription.setText(taskToEdit.getDescription());
             
@@ -103,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
                 // Try to parse the existing date
                 textSelectedDate.setText(taskToEdit.getDate());
             } catch (Exception e) {
-                textSelectedDate.setText("No date selected");
+                textSelectedDate.setText(R.string.no_date_selected);
             }
         }
         
@@ -126,17 +130,17 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         
         // Create and show the dialog
         AlertDialog dialog = builder.create();
-        dialog.setButton(AlertDialog.BUTTON_POSITIVE, "Save", (dialogInterface, i) -> {
-            String title = editTitle.getText().toString().trim();
-            String description = editDescription.getText().toString().trim();
+        dialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.save), (dialogInterface, i) -> {
+            String title = editTitle.getText() != null ? editTitle.getText().toString().trim() : "";
+            String description = editDescription.getText() != null ? editDescription.getText().toString().trim() : "";
             String date = textSelectedDate.getText().toString();
             
             if (title.isEmpty()) {
-                Toast.makeText(MainActivity.this, "Title cannot be empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.title_empty_error, Toast.LENGTH_SHORT).show();
                 return;
             }
             
-            if (date.equals("No date selected")) {
+            if (date.equals(getString(R.string.no_date_selected))) {
                 date = dateFormat.format(selectedDate.getTime()); // Use current date
             }
             
@@ -157,9 +161,7 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
             loadTasks();
         });
         
-        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", (dialogInterface, i) -> {
-            dialog.dismiss();
-        });
+        dialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.cancel), (dialogInterface, i) -> dialog.dismiss());
         
         dialog.show();
     }
@@ -186,6 +188,6 @@ public class MainActivity extends AppCompatActivity implements TaskAdapter.OnTas
         Task task = taskAdapter.getTaskAt(position);
         databaseHelper.deleteTask(task.getId());
         loadTasks(); // Refresh the list
-        Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.task_deleted, Toast.LENGTH_SHORT).show();
     }
 }
